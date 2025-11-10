@@ -4,8 +4,43 @@ import LoginPage from '@/pages/login';
 import HomePage from '@/pages/home';
 import ProtectedRoute from './ProtectedRoute';
 
+// Loading component for session validation
+const LoadingSpinner = () => (
+  <div style={{
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '100vh',
+    flexDirection: 'column',
+    gap: '1rem'
+  }}>
+    <div style={{
+      width: '40px',
+      height: '40px',
+      border: '4px solid #f3f3f3',
+      borderTop: '4px solid #007bff',
+      borderRadius: '50%',
+      animation: 'spin 1s linear infinite'
+    }} />
+    <p style={{ color: '#666' }}>Loading...</p>
+    <style>
+      {`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}
+    </style>
+  </div>
+);
+
 function AppRouter() {
-  const { isAuth } = useAuth();
+  const { isAuth, isLoading } = useAuth();
+
+  // Show loading spinner while checking session
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <BrowserRouter>
@@ -21,6 +56,11 @@ function AppRouter() {
               <HomePage />
             </ProtectedRoute>
           } 
+        />
+        {/* Catch all route - redirect to home if authenticated, login if not */}
+        <Route 
+          path='*' 
+          element={<Navigate to={isAuth ? "/home" : "/"} replace />} 
         />
       </Routes>
     </BrowserRouter>

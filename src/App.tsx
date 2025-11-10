@@ -1,12 +1,15 @@
 import './App.css';
 import { AuthProvider } from '@/providers/AuthProvider';
+import { QueryProvider } from '@/providers/QueryProvider';
 import AppRouter from '@/router/AppRouter';
 
 function App() {
   return (
-    <AuthProvider>
-      <AppRouter />
-    </AuthProvider>
+    <QueryProvider>
+      <AuthProvider>
+        <AppRouter />
+      </AuthProvider>
+    </QueryProvider>
   );
 }
 
