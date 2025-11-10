@@ -14,6 +14,25 @@ interface LoginResponse {
   message?: string;
 }
 
+interface UserData {
+  id: string;
+  email: string;
+  name?: string;
+  role?: string;
+  createdAt?: string;
+  lastLogin?: string;
+  preferences?: {
+    theme?: string;
+    notifications?: boolean;
+  };
+}
+
+interface UserDataResponse {
+  success: boolean;
+  user?: UserData;
+  message?: string;
+}
+
 interface ApiError {
   message: string;
   status?: number;
@@ -105,7 +124,36 @@ class ApiService {
       throw error as ApiError;
     }
   }
+
+  async getUserData(): Promise<UserDataResponse> {
+    try {
+      const response = await fetch(`${this.baseUrl}/user/me`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw {
+          message: data.message || 'Failed to fetch user data',
+          status: response.status,
+        } as ApiError;
+      }
+
+      return data;
+    } catch (error) {
+      if (error instanceof TypeError) {
+        throw {
+          message: 'Network error while fetching user data',
+          status: 0,
+        } as ApiError;
+      }
+      
+      throw error as ApiError;
+    }
+  }
 }
 
 export const apiService = new ApiService();
-export type { LoginCredentials, LoginResponse, ApiError };
+export type { LoginCredentials, LoginResponse, ApiError, UserData, UserDataResponse };
