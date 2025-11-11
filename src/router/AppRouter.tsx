@@ -2,6 +2,10 @@ import { BrowserRouter, Route, Routes, Navigate } from 'react-router';
 import { useAuth } from '@/providers/AuthProvider'
 import LoginPage from '@/pages/login';
 import HomePage from '@/pages/home';
+import AdminsPage from '@/pages/admins';
+import BrandsPage from '@/pages/brands';
+import CampaignsPage from '@/pages/campaigns';
+import InfluencersPage from '@/pages/influencers';
 import ProtectedRoute from './ProtectedRoute';
 
 // Loading component for session validation
@@ -54,6 +58,38 @@ function AppRouter() {
           element={
             <ProtectedRoute>
               <HomePage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path='/admins' 
+          element={
+            <ProtectedRoute>
+              <AdminsPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path='/brands' 
+          element={
+            <ProtectedRoute>
+              <BrandsPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path='/campaigns' 
+          element={
+            <ProtectedRoute>
+              <CampaignsPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path='/influencers' 
+          element={
+            <ProtectedRoute>
+              <InfluencersPage />
             </ProtectedRoute>
           } 
         />
