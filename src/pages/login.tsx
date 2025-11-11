@@ -1,5 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/providers/AuthProvider';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 const LoginPage = () => {
   const { login, isLoading, error, clearError } = useAuth();
@@ -76,128 +87,70 @@ const LoginPage = () => {
   };
 
   return (
-    <div style={{ 
-      display: 'flex', 
-      flexDirection: 'column', 
-      alignItems: 'center', 
-      justifyContent: 'center', 
-      minHeight: '100vh',
-      padding: '2rem',
-      backgroundColor: '#f5f5f5'
-    }}>
-      <div style={{
-        backgroundColor: 'white',
-        padding: '2rem',
-        borderRadius: '8px',
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-        width: '100%',
-        maxWidth: '400px',
-      }}>
-        <h1 style={{ 
-          textAlign: 'center', 
-          marginBottom: '2rem',
-          color: '#333'
-        }}>
-          Sign In
-        </h1>
-
-        {error && (
-          <div style={{
-            backgroundColor: '#fee',
-            color: '#c33',
-            padding: '0.75rem',
-            borderRadius: '4px',
-            marginBottom: '1rem',
-            border: '1px solid #fcc',
-          }}>
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{
-              display: 'block',
-              marginBottom: '0.5rem',
-              fontWeight: 'bold',
-              color: '#333'
-            }}>
-              Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                border: formErrors.email ? '2px solid #c33' : '1px solid #ddd',
-                borderRadius: '4px',
-                fontSize: '16px',
-                boxSizing: 'border-box'
-              }}
-              placeholder="Enter your email"
-              disabled={isLoading}
-            />
-            {formErrors.email && (
-              <div style={{ color: '#c33', fontSize: '14px', marginTop: '0.25rem' }}>
-                {formErrors.email}
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle>Sign In</CardTitle>
+          <CardDescription>
+            Enter your email below to login to your account
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {error && (
+            <div className="mb-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-800">
+              {error}
+            </div>
+          )}
+          
+          <form onSubmit={handleSubmit}>
+            <div className="flex flex-col gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="m@example.com"
+                  disabled={isLoading}
+                  className={formErrors.email ? 'border-red-500' : ''}
+                />
+                {formErrors.email && (
+                  <p className="text-sm text-red-600">{formErrors.email}</p>
+                )}
               </div>
-            )}
-          </div>
 
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{
-              display: 'block',
-              marginBottom: '0.5rem',
-              fontWeight: 'bold',
-              color: '#333'
-            }}>
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                border: formErrors.password ? '2px solid #c33' : '1px solid #ddd',
-                borderRadius: '4px',
-                fontSize: '16px',
-                boxSizing: 'border-box'
-              }}
-              placeholder="Enter your password"
-              disabled={isLoading}
-            />
-            {formErrors.password && (
-              <div style={{ color: '#c33', fontSize: '14px', marginTop: '0.25rem' }}>
-                {formErrors.password}
+              <div className="grid gap-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  placeholder="Enter your password"
+                  disabled={isLoading}
+                  className={formErrors.password ? 'border-red-500' : ''}
+                />
+                {formErrors.password && (
+                  <p className="text-sm text-red-600">{formErrors.password}</p>
+                )}
               </div>
-            )}
-          </div>
-
-          <button 
-            type="submit"
+            </div>
+          </form>
+        </CardContent>
+        <CardFooter>
+          <Button 
+            type="submit" 
+            className="w-full" 
             disabled={isLoading}
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              fontSize: '16px',
-              backgroundColor: isLoading ? '#ccc' : '#007bff',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: isLoading ? 'not-allowed' : 'pointer',
-              transition: 'background-color 0.2s'
-            }}
+            onClick={handleSubmit}
           >
             {isLoading ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
-      </div>
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 };
