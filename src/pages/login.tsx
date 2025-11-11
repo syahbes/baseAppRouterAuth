@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/providers/AuthProvider';
+import { Button } from '@/components/ui/button';
 
 const LoginPage = () => {
   const { login, isLoading, error, clearError } = useAuth();
@@ -178,24 +179,10 @@ const LoginPage = () => {
               </div>
             )}
           </div>
-
-          <button 
-            type="submit"
-            disabled={isLoading}
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              fontSize: '16px',
-              backgroundColor: isLoading ? '#ccc' : '#007bff',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: isLoading ? 'not-allowed' : 'pointer',
-              transition: 'background-color 0.2s'
-            }}
-          >
+          <Button type="submit" disabled={isLoading}>
             {isLoading ? 'Signing in...' : 'Sign In'}
-          </button>
+          </Button>
+
         </form>
       </div>
     </div>
