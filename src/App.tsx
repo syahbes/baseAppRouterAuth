@@ -1,4 +1,3 @@
-import './App.css';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
 import AppRouter from '@/router/AppRouter';
