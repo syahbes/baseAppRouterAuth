@@ -1,6 +1,5 @@
 // src/pages/home.tsx
 import { useAuth } from '@/providers/AuthProvider';
-import { UserProfile } from '@/components/UserProfile'
 
 const Home = () => {
   const { user, logout } = useAuth();
@@ -22,8 +21,6 @@ const Home = () => {
           <p>Logged in as: {user.email}</p>
         </div>
       )}
-
-      <UserProfile />
 
       <button onClick={handleLogout} className="logout-btn">
         Logout

@@ -1,10 +1,17 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import { apiService, type LoginCredentials, type ApiError } from '@/services/apiService';
+import { jwtDecode } from 'jwt-decode';
 
 interface User {
-  id: string;
   email: string;
-  name?: string;
+  user_name:string;
+  role:string;
+}
+
+interface JWTPayload {
+  email: string;
+  user_name: string;
+  role: string;
 }
 
 interface AuthContextType {
@@ -26,42 +33,21 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isAuth, setIsAuth] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // Start as true to check session
+  const [isLoading, setIsLoading] = useState(false); // Start as true to check session
   const [error, setError] = useState<string | null>(null);
-
-  // Check for existing session on app load
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const response = await apiService.validateSession();
-        if (response.success && response.user) {
-          setIsAuth(true);
-          setUser(response.user);
-        }
-      } catch (error) {
-        // Session is invalid or expired, stay logged out
-        console.log('No valid session found');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkSession();
-  }, []);
+   
+  //TODO: check for existing session on app load
 
   const login = async (credentials: LoginCredentials) => {
     setIsLoading(true);
     setError(null);
-    
+ 
     try {
       const response = await apiService.login(credentials);
-      
-      if (response.success && response.user) {
-        setIsAuth(true);
-        setUser(response.user);
-      } else {
-        throw new Error(response.message || 'Login failed');
-      }
+      const decodedToken = jwtDecode<JWTPayload>(response?.accessToken);
+      setUser({email: decodedToken.email, user_name: decodedToken.user_name, role: decodedToken.role})
+
+      setIsAuth(true);
     } catch (error) {
       const apiError = error as ApiError;
       setError(apiError.message || 'An unexpected error occurred');

@@ -3,14 +3,14 @@ import { useQuery } from '@tanstack/react-query';
 import { apiService } from '@/services/apiService';
 import { useAuth } from '@/providers/AuthProvider';
 
-export const useUserData = () => {
+export const useAdminsData = () => {
   const { isAuth } = useAuth();
 
   return useQuery({
-    queryKey: ['userData'],
+    queryKey: ['adminsData'],
     queryFn: async () => {
-      const response = await apiService.getUserData();
-      return response.user;
+      const response = await apiService.getAdmins();
+      return response;
     },
     enabled: isAuth, // Only fetch when user is authenticated
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
