@@ -3,13 +3,21 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/AuthProvider";
 
 const Home = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, refresh } = useAuth();
 
   const handleLogout = async () => {
     try {
       await logout();
     } catch (error) {
       console.error("Logout failed:", error);
+    }
+  };
+
+  const handleRefresh = async () => {
+    try {
+      await refresh();
+    } catch (error) {
+      console.error("Refresh failed:", error);
     }
   };
 
@@ -31,10 +39,14 @@ const Home = () => {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
+          gap: "20px",
         }}
       >
         <Button onClick={handleLogout} className="logout-btn">
           Logout
+        </Button>
+        <Button onClick={handleRefresh} className="logout-btn">
+          Refresh
         </Button>
       </div>
     </div>

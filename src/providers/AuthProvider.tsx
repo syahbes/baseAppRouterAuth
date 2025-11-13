@@ -21,6 +21,7 @@ interface AuthContextType {
   error: string | null;
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => Promise<void>;
+  refresh: () => Promise<void>;
   clearError: () => void;
 }
 
@@ -73,6 +74,31 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  const refresh = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await apiService.refresh();
+      const decodedToken = jwtDecode<JWTPayload>(response?.accessToken);
+      setUser({
+        email: decodedToken.email,
+        user_name: decodedToken.user_name,
+        role: decodedToken.role
+      });
+      setIsAuth(true);
+    } catch (error) {
+      const apiError = error as ApiError;
+      setError(apiError.message || 'Failed to refresh token');
+      // If refresh fails, clear auth state
+      setIsAuth(false);
+      setUser(null);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const clearError = () => {
     setError(null);
   };
@@ -84,6 +110,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     error,
     login,
     logout,
+    refresh,
     clearError,
   };
 

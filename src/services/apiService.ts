@@ -99,6 +99,35 @@ class ApiService {
     }
   }
 
+  async refresh(): Promise<LoginResponse> {
+    try {
+      const response = await fetch(`${this.baseUrl}/auth/refresh`, {
+        method: "POST",
+        credentials: "include", // This sends the refresh token cookie
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw {
+          message: data.message || "Token refresh failed",
+          status: response.status,
+        } as ApiError;
+      }
+
+      return data;
+    } catch (error) {
+      if (error instanceof TypeError) {
+        throw {
+          message: "Network error during token refresh",
+          status: 0,
+        } as ApiError;
+      }
+
+      throw error as ApiError;
+    }
+  }
+
   async getAdmins(): Promise<AdminsDataResponse> {
     try {
       const response = await fetch(`${this.baseUrl}/admins`, {
