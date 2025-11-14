@@ -1,11 +1,11 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { apiService, type LoginCredentials, type ApiError } from '@/services/apiService';
 import { jwtDecode } from 'jwt-decode';
 
 interface User {
   email: string;
-  user_name:string;
-  role:string;
+  user_name: string;
+  role: string;
 }
 
 interface JWTPayload {
@@ -21,7 +21,6 @@ interface AuthContextType {
   error: string | null;
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => Promise<void>;
-  refresh: () => Promise<void>;
   clearError: () => void;
 }
 
@@ -34,25 +33,59 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isAuth, setIsAuth] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false); // Start as true to check session
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-   
-  //TODO: check for existing session on app load
+
+  // Check for existing session on app load
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const response = await apiService.refresh();
+        const decodedToken = jwtDecode<JWTPayload>(response.accessToken);
+        
+        if (decodedToken.role !== 'admin' && decodedToken.role !== 'super_admin') {
+          // User doesn't have proper role, log them out
+          await apiService.logout();
+          setIsAuth(false);
+          setUser(null);
+        } else {
+          setUser({
+            email: decodedToken.email,
+            user_name: decodedToken.user_name,
+            role: decodedToken.role,
+          });
+          setIsAuth(true);
+        }
+      } catch (error) {
+        // If refresh fails, user is not authenticated
+        console.log('No valid session found');
+        setIsAuth(false);
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkSession();
+  }, []);
 
   const login = async (credentials: LoginCredentials) => {
     setIsLoading(true);
     setError(null);
- 
+
     try {
       const response = await apiService.login(credentials);
-      const decodedToken = jwtDecode<JWTPayload>(response?.accessToken);
-      setUser({email: decodedToken.email, user_name: decodedToken.user_name, role: decodedToken.role})
-
+      const decodedToken = jwtDecode<JWTPayload>(response.accessToken);
+      setUser({
+        email: decodedToken.email,
+        user_name: decodedToken.user_name,
+        role: decodedToken.role,
+      });
       setIsAuth(true);
     } catch (error) {
       const apiError = error as ApiError;
       setError(apiError.message || 'An unexpected error occurred');
-      throw error; // Re-throw so the login component can handle it
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -60,7 +93,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const logout = async () => {
     setIsLoading(true);
-    
+
     try {
       await apiService.logout();
     } catch (error) {
@@ -70,31 +103,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setIsAuth(false);
       setUser(null);
       setError(null);
-      setIsLoading(false);
-    }
-  };
-
-  const refresh = async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await apiService.refresh();
-      const decodedToken = jwtDecode<JWTPayload>(response?.accessToken);
-      setUser({
-        email: decodedToken.email,
-        user_name: decodedToken.user_name,
-        role: decodedToken.role
-      });
-      setIsAuth(true);
-    } catch (error) {
-      const apiError = error as ApiError;
-      setError(apiError.message || 'Failed to refresh token');
-      // If refresh fails, clear auth state
-      setIsAuth(false);
-      setUser(null);
-      throw error;
-    } finally {
       setIsLoading(false);
     }
   };
@@ -110,7 +118,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     error,
     login,
     logout,
-    refresh,
     clearError,
   };
 

@@ -1,11 +1,11 @@
 import { useAdminsData } from "@/hooks/useAdminsData";
-
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const Admins = () => {
 const { data: admins, isLoading, isError, error } = useAdminsData();
 
 if (isLoading) {
-  return <div>Loading...</div>;
+  return <LoadingSpinner />;
 }
 
 if (isError) {

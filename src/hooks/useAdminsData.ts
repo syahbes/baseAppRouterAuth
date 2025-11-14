@@ -1,19 +1,12 @@
-// src/hooks/useUserData.ts
+// src/hooks/useAdminsData.ts
 import { useQuery } from '@tanstack/react-query';
-import { apiService } from '@/services/apiService';
-import { useAuth } from '@/providers/AuthProvider';
+import { apiService, type AdminsDataResponse } from '@/services/apiService';
 
 export const useAdminsData = () => {
-  const { isAuth } = useAuth();
-
-  return useQuery({
-    queryKey: ['adminsData'],
-    queryFn: async () => {
-      const response = await apiService.getAdmins();
-      return response;
-    },
-    enabled: isAuth, // Only fetch when user is authenticated
-    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
-    retry: 1, // Only retry once on failure
+  return useQuery<AdminsDataResponse, Error>({
+    queryKey: ['admins'],
+    queryFn: () => apiService.getAdmins(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1,
   });
 };

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/AuthProvider";
 
 const Home = () => {
-  const { user, logout, refresh } = useAuth();
+  const { user, logout } = useAuth();
 
   const handleLogout = async () => {
     try {
@@ -14,11 +14,12 @@ const Home = () => {
   };
 
   const handleRefresh = async () => {
-    try {
-      await refresh();
-    } catch (error) {
-      console.error("Refresh failed:", error);
-    }
+   console.log("used to be Refresh");
+    // try {
+    //   await refresh();
+    // } catch (error) {
+    //   console.error("Refresh failed:", error);
+    // }
   };
 
   return (
@@ -28,6 +29,7 @@ const Home = () => {
       {user && (
         <div className="user-info">
           <p>Logged in as: {user.email}</p>
+          <p>role: {user.role}</p>
         </div>
       )}
 
