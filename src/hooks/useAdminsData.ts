@@ -1,6 +1,7 @@
 // src/hooks/useAdminsData.ts
 import { useQuery } from '@tanstack/react-query';
-import { apiService, type AdminsDataResponse } from '@/services/apiService';
+import { apiService } from '@/services/apiService';
+import type { AdminsDataResponse } from '@/types';
 
 export const useAdminsData = () => {
   return useQuery<AdminsDataResponse, Error>({
