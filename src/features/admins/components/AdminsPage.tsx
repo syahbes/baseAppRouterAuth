@@ -1,7 +1,7 @@
-import { useAdminsData } from "@/hooks/useAdminsData";
+import { useAdminsData } from "../hooks";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
-const Admins = () => {
+const AdminsPage = () => {
 const { data: admins, isLoading, isError, error } = useAdminsData();
 
 if (isLoading) {
@@ -24,4 +24,4 @@ return (
   );
 };
 
-export default Admins;
+export default AdminsPage;

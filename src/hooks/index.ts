@@ -2,7 +2,7 @@
 
 /**
  * Barrel export for all hooks
- * This allows importing hooks from a single location: import { useAuth, useAdminsData } from '@/hooks'
+ * Note: Feature-specific hooks are exported from their respective feature folders
  */
 
 export {
@@ -12,5 +12,3 @@ export {
   useIsAuthenticated,
   AUTH_KEYS,
 } from './useAuth';
-
-export { useAdminsData } from './useAdminsData';
