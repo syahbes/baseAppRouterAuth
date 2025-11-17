@@ -53,7 +53,9 @@ export const useLogout = () => {
       await authService.logout();
     },
     onSettled: () => {
-      // Clear all queries on logout
+     // Immediately clear the user data from cache
+      queryClient.setQueryData(AUTH_KEYS.user, null);
+      // Then clear all queries
       queryClient.clear();
     },
   });
