@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Routes, Navigate } from 'react-router';
 import { useIsAuthenticated } from '@/hooks/useAuth';
 import LoginPage from '@/pages/login';
 import HomePage from '@/pages/home';
-import AdminsPage from '@/features/admins/components/AdminsPage';
+import { AdminsPage } from '@/features/admins';
 import {BrandsPage} from '@/features/brands/';
 import CampaignsPage from '@/pages/campaigns';
 import InfluencersPage from '@/pages/influencers';

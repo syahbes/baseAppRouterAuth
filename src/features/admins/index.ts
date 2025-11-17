@@ -5,4 +5,4 @@
  */
 
 export * from './hooks';
-export * from './components/AdminsPage';
+export * from './components';
