@@ -1,60 +1,47 @@
 // src/services/authService.ts
 import axios, { AxiosError } from 'axios';
+import { config } from '@/config/env';
 import { getUserFromToken, isAdminRole } from '@/utils/tokenUtils';
-import type { User } from '@/utils/tokenUtils';
-
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
-
-export interface AuthResponse {
-  accessToken: string;
-  refreshToken: string;
-}
-
-export interface AuthError {
-  message: string;
-  status?: number;
-}
+import type { LoginCredentials, AuthResult, ApiError } from '@/types';
 
 class AuthService {
-  private baseURL: string;
+  private readonly baseURL: string;
 
   constructor() {
-    this.baseURL = import.meta.env.VITE_API_URL || "";
-    
-    if (!this.baseURL) {
-      console.warn("VITE_API_URL not found in environment variables");
-    }
+    this.baseURL = config.apiUrl;
   }
 
-  private handleError(error: AxiosError): AuthError {
+  private handleError(error: AxiosError): ApiError {
     if (error.response) {
       const data = error.response.data as any;
       return {
         message: data?.message || 'An error occurred',
         status: error.response.status,
+        code: data?.code,
       };
-    } else if (error.request) {
+    }
+    
+    if (error.request) {
       return {
         message: 'Network error. Please check your connection.',
         status: 0,
-      };
-    } else {
-      return {
-        message: error.message || 'An unexpected error occurred',
-        status: 0,
+        code: 'NETWORK_ERROR',
       };
     }
+    
+    return {
+      message: error.message || 'An unexpected error occurred',
+      status: 0,
+      code: 'UNKNOWN_ERROR',
+    };
   }
 
   /**
    * Login admin user
    */
-  async login(credentials: LoginCredentials): Promise<{ user: User; tokens: AuthResponse }> {
+  async login(credentials: LoginCredentials): Promise<AuthResult> {
     try {
-      const response = await axios.post<AuthResponse>(
+      const response = await axios.post<AuthResult['tokens']>(
         `${this.baseURL}/auth/login/admin`,
         credentials,
         { withCredentials: true }
@@ -62,7 +49,6 @@ class AuthService {
 
       const user = getUserFromToken(response.data.accessToken);
       
-      // Verify user has admin role
       if (!isAdminRole(user.role)) {
         throw new Error('Unauthorized: Admin access required');
       }
@@ -87,7 +73,6 @@ class AuthService {
         { withCredentials: true }
       );
     } catch (error) {
-      // Don't throw error for logout - we'll clear local state anyway
       console.error('Logout error:', error);
     }
   }
@@ -95,9 +80,9 @@ class AuthService {
   /**
    * Refresh access token
    */
-  async refresh(): Promise<{ user: User; tokens: AuthResponse }> {
+  async refresh(): Promise<AuthResult> {
     try {
-      const response = await axios.post<AuthResponse>(
+      const response = await axios.post<AuthResult['tokens']>(
         `${this.baseURL}/auth/refresh`,
         {},
         { withCredentials: true }
@@ -105,7 +90,6 @@ class AuthService {
 
       const user = getUserFromToken(response.data.accessToken);
       
-      // Verify user still has admin role
       if (!isAdminRole(user.role)) {
         throw new Error('Unauthorized: Admin access required');
       }

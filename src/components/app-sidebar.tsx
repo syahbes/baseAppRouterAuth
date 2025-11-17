@@ -1,3 +1,4 @@
+// src/components/app-sidebar.tsx
 import { 
   Home, 
   Users, 
@@ -9,7 +10,7 @@ import {
   Settings
 } from "lucide-react"
 import { useNavigate, useLocation } from "react-router"
-import { useAuth } from "@/providers/AuthProvider"
+import { useAuthUser, useLogout } from "@/hooks/useAuth"
 
 import {
   Sidebar,
@@ -61,19 +62,19 @@ const items = [
 export function AppSidebar() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { user, logout } = useAuth()
+  const { data: user } = useAuthUser()
+  const { mutate: logout } = useLogout()
 
   const handleNavigation = (url: string) => {
     navigate(url)
   }
 
-  const handleLogout = async () => {
-    try {
-      await logout()
-      navigate("/login")
-    } catch (error) {
-      console.error("Logout failed:", error)
-    }
+  const handleLogout = () => {
+    logout(undefined, {
+      onSuccess: () => {
+        navigate("/")
+      },
+    })
   }
 
   return (

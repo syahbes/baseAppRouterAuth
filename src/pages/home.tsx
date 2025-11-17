@@ -1,25 +1,19 @@
 // src/pages/home.tsx
+import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/providers/AuthProvider";
+import { useAuthUser, useLogout } from "@/hooks/useAuth";
 
 const Home = () => {
-  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const { data: user } = useAuthUser();
+  const { mutate: logout } = useLogout();
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
-
-  const handleRefresh = async () => {
-   console.log("used to be Refresh");
-    // try {
-    //   await refresh();
-    // } catch (error) {
-    //   console.error("Refresh failed:", error);
-    // }
+  const handleLogout = () => {
+    logout(undefined, {
+      onSuccess: () => {
+        navigate("/");
+      },
+    });
   };
 
   return (
@@ -46,9 +40,6 @@ const Home = () => {
       >
         <Button onClick={handleLogout} className="logout-btn">
           Logout
-        </Button>
-        <Button onClick={handleRefresh} className="logout-btn">
-          Refresh
         </Button>
       </div>
     </div>
