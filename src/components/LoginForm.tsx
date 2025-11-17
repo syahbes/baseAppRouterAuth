@@ -1,14 +1,17 @@
+// src/components/LoginForm.tsx
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { loginSchema, type LoginFormData } from '@/lib/validations/auth';
-import { useAuth } from '@/providers/AuthProvider';
+import { useLogin } from '@/hooks/useAuth';
 
 export const LoginForm = () => {
-  const { login, isLoading, error, clearError } = useAuth();
+  const navigate = useNavigate();
+  const { mutate: login, isPending, error, reset } = useLogin();
   
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -19,23 +22,24 @@ export const LoginForm = () => {
   const password = form.watch('password');
 
   const onSubmit = async (data: LoginFormData) => {
-    try {
-      await login(data);
-    } catch (err) {
-      console.error('Login failed:', err);
-    }
+    login(data, {
+      onSuccess: () => {
+        navigate('/home');
+      },
+    });
   };
 
+  // Clear error when user types
   useEffect(() => {
-    if (error) clearError();
-  }, [email, password, error, clearError]);
+    if (error) reset();
+  }, [email, password, error, reset]);
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         {error && (
           <div className="mb-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-800">
-            {error}
+            {error.message}
           </div>
         )}
         
@@ -67,8 +71,8 @@ export const LoginForm = () => {
           )}
         />
         
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? 'Signing in...' : 'Sign In'}
+        <Button type="submit" className="w-full" disabled={isPending}>
+          {isPending ? 'Signing in...' : 'Sign In'}
         </Button>
       </form>
     </Form>

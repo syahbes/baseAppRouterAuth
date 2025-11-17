@@ -1,5 +1,6 @@
+// src/router/AppRouter.tsx
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router';
-import { useAuth } from '@/providers/AuthProvider'
+import { useIsAuthenticated } from '@/hooks/useAuth';
 import LoginPage from '@/pages/login';
 import HomePage from '@/pages/home';
 import AdminsPage from '@/pages/admins';
@@ -10,7 +11,7 @@ import ProtectedRoute from './ProtectedRoute';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 function AppRouter() {
-  const { isAuth, isLoading } = useAuth();
+  const { isAuth, isLoading } = useIsAuthenticated();
 
   if (isLoading) {
     return <LoadingSpinner />;
