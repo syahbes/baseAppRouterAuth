@@ -2,6 +2,7 @@
 import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { useAuthUser, useLogout } from "@/hooks/useAuth";
+import { ModeToggle } from "@/components/mode-toggle";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -17,8 +18,9 @@ const Home = () => {
   };
 
   return (
-    <div className="home-page">
+    <div>
       <h1>Welcome to Home Page</h1>
+      <ModeToggle />
 
       {user && (
         <div className="user-info">

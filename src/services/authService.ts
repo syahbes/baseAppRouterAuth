@@ -1,8 +1,8 @@
 // src/services/authService.ts
 import axios, { AxiosError } from 'axios';
 import { config } from '@/config/env';
-import { getUserFromToken, isAdminRole } from '@/utils/tokenUtils';
-import type { LoginCredentials, AuthResult, ApiError } from '@/types';
+import { isAdminRole } from '@/utils/tokenUtils';
+import type { LoginCredentials, User, ApiError } from '@/types';
 
 class AuthService {
   private readonly baseURL: string;
@@ -37,26 +37,38 @@ class AuthService {
   }
 
   /**
+   * Get current user information
+   */
+  async getMe(): Promise<User> {
+    try {
+      const response = await axios.get<User>(
+        `${this.baseURL}/admins/me`,
+        { withCredentials: true }
+      );
+      
+      if (!isAdminRole(response.data.role)) {
+        throw new Error('Unauthorized: Admin access required');
+      }
+
+      return response.data;
+    } catch (error) {
+      throw this.handleError(error as AxiosError);
+    }
+  }
+
+  /**
    * Login admin user
    */
-  async login(credentials: LoginCredentials): Promise<AuthResult> {
+  async login(credentials: LoginCredentials): Promise<User> {
     try {
-      const response = await axios.post<AuthResult['tokens']>(
+      await axios.post(
         `${this.baseURL}/auth/login/admin`,
         credentials,
         { withCredentials: true }
       );
 
-      const user = getUserFromToken(response.data.accessToken);
-      
-      if (!isAdminRole(user.role)) {
-        throw new Error('Unauthorized: Admin access required');
-      }
-
-      return {
-        user,
-        tokens: response.data,
-      };
+      // After successful login, fetch user details
+      return await this.getMe();
     } catch (error) {
       throw this.handleError(error as AxiosError);
     }
@@ -78,26 +90,18 @@ class AuthService {
   }
 
   /**
-   * Refresh access token
+   * Refresh access token and get user
    */
-  async refresh(): Promise<AuthResult> {
+  async refresh(): Promise<User> {
     try {
-      const response = await axios.post<AuthResult['tokens']>(
+      await axios.post(
         `${this.baseURL}/auth/refresh`,
         {},
         { withCredentials: true }
       );
 
-      const user = getUserFromToken(response.data.accessToken);
-      
-      if (!isAdminRole(user.role)) {
-        throw new Error('Unauthorized: Admin access required');
-      }
-
-      return {
-        user,
-        tokens: response.data,
-      };
+      // After refresh, fetch user details
+      return await this.getMe();
     } catch (error) {
       throw this.handleError(error as AxiosError);
     }

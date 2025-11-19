@@ -8,8 +8,6 @@
 export type {
   User,
   LoginCredentials,
-  AuthResponse,
-  AuthResult,
 } from './auth.types';
 
 export type {

@@ -1,16 +1,41 @@
 // src/components/app-sidebar.tsx
-import { 
-  Home, 
-  Users, 
-  Building2, 
-  Megaphone, 
+import {
+  Home,
+  Users,
+  Building2,
+  Megaphone,
   UserCircle,
   MoreVertical,
   LogOut,
-  Settings
+  Settings,
+  Plus
 } from "lucide-react"
 import { useNavigate, useLocation } from "react-router"
 import { useAuthUser, useLogout } from "@/hooks/useAuth"
+
+// Sections configuration
+const sections = [
+  {
+    label: "Admins",
+    path: "/admins",
+    icon: UserCircle,
+  },
+  {
+    label: "Brands",
+    path: "/brands",
+    icon: Building2,
+  },
+  {
+    label: "Campaigns",
+    path: "/campaigns",
+    icon: Megaphone,
+  },
+  {
+    label: "Influencers",
+    path: "/influencers",
+    icon: Users,
+  },
+]
 
 import {
   Sidebar,
@@ -29,35 +54,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-
-// Menu items.
-const items = [
-  {
-    title: "Home",
-    url: "/home",
-    icon: Home,
-  },
-  {
-    title: "Admins",
-    url: "/admins",
-    icon: UserCircle,
-  },
-  {
-    title: "Brands",
-    url: "/brands",
-    icon: Building2,
-  },
-  {
-    title: "Campaigns",
-    url: "/campaigns",
-    icon: Megaphone,
-  },
-  {
-    title: "Influencers",
-    url: "/influencers",
-    icon: Users,
-  },
-]
+import { ModeToggle } from "./mode-toggle"
 
 export function AppSidebar() {
   const navigate = useNavigate()
@@ -84,24 +81,57 @@ export function AppSidebar() {
           <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    onClick={() => handleNavigation(item.url)}
-                    isActive={location.pathname === item.url}
-                    tooltip={item.title}
-                  >
-                    <item.icon />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  onClick={() => handleNavigation("/home")}
+                  isActive={location.pathname === "/home"}
+                  tooltip="Home"
+                >
+                  <Home />
+                  <span>Home</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {sections.map((section) => (
+          <SidebarGroup key={section.label}>
+            <SidebarGroupLabel>{section.label}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={() => handleNavigation(section.path)}
+                    isActive={location.pathname === section.path}
+                    tooltip={section.label}
+                  >
+                    <section.icon />
+                    <span>See all {section.label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={() => handleNavigation(`${section.path}/create`)}
+                    isActive={location.pathname === `${section.path}/create`}
+                    tooltip={`Create ${section.label}`}
+                  >
+                    <Plus />
+                    <span>Create {section.label.slice(0, -1)}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
-      
+
       <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <ModeToggle />
+          </SidebarMenuItem>
+        </SidebarMenu>
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
@@ -113,7 +143,7 @@ export function AppSidebar() {
                   <UserCircle className="h-8 w-8" />
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-semibold">
-                      {user?.email?.split("@")[0] || "User"}
+                      {user?.firstName || "User"}
                     </span>
                     <span className="truncate text-xs">
                       {user?.email || "user@example.com"}

@@ -1,5 +1,6 @@
 // src/components/LoginForm.tsx
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -12,7 +13,8 @@ import { useLogin } from '@/hooks/useAuth';
 export const LoginForm = () => {
   const navigate = useNavigate();
   const { mutate: login, isPending, error, reset } = useLogin();
-  
+  const [showPassword, setShowPassword] = useState(false);
+
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: '', password: '' },
@@ -42,7 +44,7 @@ export const LoginForm = () => {
             {error.message}
           </div>
         )}
-        
+
         <FormField
           control={form.control}
           name="email"
@@ -64,13 +66,27 @@ export const LoginForm = () => {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="Enter your password" {...field} />
+                <div className="relative">
+                  <Input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Enter your password"
+                    {...field}
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        
+
         <Button type="submit" className="w-full" disabled={isPending}>
           {isPending ? 'Signing in...' : 'Sign In'}
         </Button>

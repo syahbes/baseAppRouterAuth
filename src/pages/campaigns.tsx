@@ -1,6 +1,6 @@
 const Campaigns = () => {
   return (
-    <div className="home-page">
+    <div>
       <h1>Campaigns</h1>
     </div>
   );

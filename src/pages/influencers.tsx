@@ -1,6 +1,6 @@
 const Influencers = () => {
   return (
-    <div className="home-page">
+    <div>
       <h1>Influencers</h1>
     </div>
   );
